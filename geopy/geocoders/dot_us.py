@@ -102,20 +102,23 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
             url = Request(url, headers={"Authorization": auth})
         page = self._call_geocoder(url, timeout=timeout, raw=True)
         content = page.read().decode("utf-8") if py3k else page.read() # pylint: disable=E1101,E1103
+        places = [r for r in csv.reader(content.split("\n"), delimiter=',')]
+        """
         places = [
             r for r in csv.reader(
                 [content, ] if not isinstance(content, list)
-                else content
+                else [content.split("\n")[0]]
             )
         ]
+        """
         if not len(places):
             return None
         if exactly_one is True:
             return self._parse_result(places[0])
         else:
             result = [self._parse_result(res) for res in places]
-            if None in result: # todo
-                return None
+            #if None in result: # todo
+            #    return None
             return result
 
     @staticmethod
